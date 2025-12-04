@@ -20,6 +20,45 @@ class Channel:
         self.youtube = build('youtube', 'v3', developerKey=api_key)
         self._load_channel_data()
 
+    def __str__(self) -> str:
+        return f'{self.title}({self.url})'
+
+    def __add__(self, other):
+        """Сложение подписчиков двух каналов."""
+        if isinstance(other, Channel):
+            return self.subscriber_count + other.subscriber_count
+        return NotImplemented
+
+    def __sub__(self, other):
+        """Вычитание подписчиков двух каналов."""
+        if isinstance(other, Channel):
+            return self.subscriber_count - other.subscriber_count
+        return NotImplemented
+
+    def __eq__(self, other):
+        if isinstance(other, Channel):
+            return self.subscriber_count == other.subscriber_count
+        return NotImplemented
+
+    def __lt__(self, other):
+        if isinstance(other, Channel):
+            return self.subscriber_count < other.subscriber_count
+        return NotImplemented
+
+    def __le__(self, other):
+        if isinstance(other, Channel):
+            return self.subscriber_count <= other.subscriber_count
+        return NotImplemented
+
+    def __gt__(self, other):
+        if isinstance(other, Channel):
+            return self.subscriber_count > other.subscriber_count
+        return NotImplemented
+
+    def __ge__(self, other):
+        if isinstance(other, Channel):
+            return self.subscriber_count >= other.subscriber_count
+        return NotImplemented
     # ----------------- readonly properties -----------------
     @property
     def channel_id(self):
