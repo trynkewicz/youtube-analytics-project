@@ -1,5 +1,4 @@
 import datetime
-
 from src.playlist import PlayList
 
 if __name__ == '__main__':
