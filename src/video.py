@@ -1,48 +1,48 @@
 import os
-import json
 from googleapiclient.discovery import build
 
-# Создаем объект для работы с YouTube API
-api_key = os.getenv('YT_API_KEY')
+api_key = os.getenv("YT_API_KEY")
 if not api_key:
-    raise ValueError("API-ключ YouTube не найден. Установите переменную окружения YT_API_KEY.")
+    raise ValueError("Не найден API ключ YT_API_KEY")
 
-youtube = build('youtube', 'v3', developerKey=api_key)
+youtube = build("youtube", "v3", developerKey=api_key)
 
 
 class Video:
-    """Класс для работы с YouTube видео"""
+    """Класс для работы с YouTube-видео"""
 
-    def __init__(self, video_id: str) -> None:
+    def __init__(self, video_id: str):
         self.video_id = video_id
-        self._load_video_data()
+        self.title = None
+        self.url = None
+        self.view_count = None
+        self.like_count = None
 
-    def _load_video_data(self):
-        """Получаем данные о видео через API"""
-        response = youtube.videos().list(
-            part="snippet,statistics",
-            id=self.video_id
-        ).execute()
+        try:
+            response = youtube.videos().list(
+                id=self.video_id,
+                part="snippet,statistics"
+            ).execute()
 
-        if not response['items']:
-            raise ValueError(f"Видео с id={self.video_id} не найдено")
+            if not response["items"]:
+                # видео с таким ID нет → оставляем None
+                return
 
-        item = response['items'][0]
-        snippet = item['snippet']
-        stats = item['statistics']
+            item = response["items"][0]
 
-        self.title = snippet.get('title', '')
-        self.url = f"https://www.youtube.com/watch?v={self.video_id}"
-        self.view_count = int(stats.get('viewCount', 0))
-        self.like_count = int(stats.get('likeCount', 0))
+            self.title = item["snippet"]["title"]
+            self.url = f"https://youtu.be/{self.video_id}"
+            self.view_count = int(item["statistics"].get("viewCount", 0))
+            self.like_count = int(item["statistics"].get("likeCount", 0))
 
-    def __str__(self):
-        return self.title
+        except Exception:
+            # Любая ошибка API → оставляем только video_id
+            pass
 
 
 class PLVideo(Video):
-    """Класс видео, привязанного к плейлисту"""
+    """Видео, находящееся в плейлисте"""
 
-    def __init__(self, video_id: str, playlist_id: str) -> None:
+    def __init__(self, video_id: str, playlist_id: str):
         super().__init__(video_id)
         self.playlist_id = playlist_id
